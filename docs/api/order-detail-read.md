@@ -5,11 +5,12 @@
 
 ### Description
 - 특정 주문의 상세 내역을 가져옵니다. 고객 직접 주문일 경우 관리자 항목은 비어 있습니다.
+- 존재하지 않는 orderId 요청 시 404를 반환합니다.
 
 ### Path Parameters
 - `orderId`
 
-### Request Body
+### Response Body
 ```json
 {
   "orderNumber": "주문번호",
