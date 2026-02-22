@@ -8,7 +8,7 @@
 - 주문 상태를 허용된 상태 흐름에 따라 변경한다.
 
 ### Path Params
-- id : 주문 ID
+- orderId: 주문 ID
 
 
 ### Request Body
