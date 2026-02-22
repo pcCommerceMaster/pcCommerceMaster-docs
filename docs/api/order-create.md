@@ -6,15 +6,19 @@
 
 ### Description
 - 새로운 주문을 생성하고 재고를 차감한다.
-- 생성된 주문의 초기 상태는 PREPARING이다.
+- 생성된 주문의 초기 상태는 `PREPARING`이다.
+
+## Authentication
+- 로그인 세션 필요(보호된 API)
+- 인증 실패 시 `401 UNAUTHORIZED` 반환
+- 주문 등록 관리자(adminId)는 **로그인 세션의 관리자 정보에서 추출**하여 저장
 
 ### Request Body
 ```json
 {
   "customerId": 1,
   "productId": 101,
-  "quantity": 2,
-  "adminId": 10
+  "quantity": 2
 }
 ```
 
@@ -22,7 +26,6 @@
 - customerId: 필수
 - productId: 필수
 - quantity: 필수, 1 이상(`quantity >= 1`)
-- adminId: 선택 (CS 대리 주문 시 사용)
 
 ### Business Rules
 - 상품이 삭제되지 않았고(`deleted_at IS NULL`)
@@ -31,7 +34,7 @@
 - 주문 생성 시 상품의 현재 가격을 unitPrice에 저장 (스냅샷)
 - `totalAmount` = `unitPrice` × `quantity`
 - 주문 생성 시 재고 차감
-- 주문 상태는 PREPARING으로 설정
+- 주문 상태는 `PREPARING`으로 설정
 
 ### Success Response
 - 201 Created
@@ -48,6 +51,7 @@
 ```
 
 ### Error Responses
+- 인증 실패 → `401 UNAUTHORIZED`
 - 상품 없음 → `404 PRODUCT_NOT_FOUND`
 - 재고 부족 → `409 OUT_OF_STOCK`
 - 판매 불가 → `409 PRODUCT_NOT_ON_SALE`

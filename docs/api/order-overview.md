@@ -8,6 +8,16 @@
     - `PREPARING → CANCELLED (배송 시작 이후 취소 불가)`
 - `CANCELLED` 상태는 최종 상태이며 이후 변경 불가
 
+## Content Type
+- Request: `application/json`
+- Response: `application/json`
+
+## Order Status Values
+- `PREPARING` : 준비중
+- `SHIPPING` : 배송중
+- `DELIVERED` : 배송완료
+- `CANCELLED` : 취소됨
+
 ## Endpoints (Summary)
 - POST `/api/orders` (Create)
 - GET `/api/orders` (List)
@@ -17,11 +27,13 @@
 
 ## Authentication
 - 관리자 인증 필요 (세션 또는 토큰 — 프로젝트 기준 따름)
+- 인증 실패 시 `401 UNAUTHORIZED` 반환
 
 ## Common Error Codes
-| HTTP | Code                 | 설명                            |
-|------|----------------------|-------------------------------|
-| 400  | `INVALID_REQUEST`     | 필수 값 누락, 형식 오류, 요청값 유효성 검증 실패 |
+| HTTP | Code                   | 설명                            |
+|------|------------------------|-------------------------------|
+| 400  | `INVALID_REQUEST`      | 필수 값 누락, 형식 오류, 요청값 유효성 검증 실패 |
+| 401  | `UNAUTHORIZED`         | 인증 실패                         |
 | 404  | `PRODUCT_NOT_FOUND`    | 상품이 존재하지 않음                   |
 | 404  | `ORDER_NOT_FOUND`      | 주문이 존재하지 않음                   |
 | 409  | `OUT_OF_STOCK`         | 재고 부족                         |

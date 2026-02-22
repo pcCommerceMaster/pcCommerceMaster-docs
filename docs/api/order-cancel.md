@@ -11,6 +11,10 @@
 ### Path Params
 - orderId: 주문 ID
 
+## Authentication
+- 로그인 세션 필요(보호된 API)
+- 인증 실패 시 `401 UNAUTHORIZED` 반환
+
 ### Request Body
 ```json
 {
@@ -24,9 +28,11 @@
 ### Business Rules
 - `PREPARING` 상태에서만 취소 가능
 - 상태를 `CANCELLED`로 변경
-- 취소 사유를 cancelReason에 저장
+- 취소 사유를 `cancelReason`에 저장
 - 주문 수량만큼 재고 복구
 - 취소 처리는 단일 트랜잭션으로 수행
+- `CANCELLED` 상태 이후에는 추가 상태 변경 불가
+- 상품이 `DISCONTINUED` 상태여도 재고는 복구하되, 상품 상태는 `DISCONTINUED`를 유지한다.
 
 ### Success Response
 - 200 OK
@@ -44,6 +50,7 @@
 - `DELIVERED` 상태에서 취소 시도
 
 ### Error Responses
+- 인증 실패 → `401 UNAUTHORIZED`
 - 주문 없음 → `404 ORDER_NOT_FOUND`
 - 취소 불가 상태 → `409 INVALID_ORDER_STATUS`
 - 요청 오류 → `400 INVALID_REQUEST` (취소 사유 누락/형식 오류 등)
