@@ -87,6 +87,8 @@ POST /api/products
 - category: ENUM 
 - price: 0 이상
 - stock: 0 이상
+- category: 공통사항에 정의된 상품 카테고리 Enum 값 (문자열)
+- status: 공통사항에 정의된 상품 상태 Enum 값 (문자열)
 
 ### Response Body (201 Created)
 
@@ -231,11 +233,7 @@ PATCH /api/products/{productId}
 - 가격 (price)
 
 ### 제한 사항
-- DISCONTINUED 상태 상품은 수정 불가
 - deleted_at NOT NULL 수정 불가
-
-### 처리
-- updated_at 자동 갱신
 
 ### Request
 
@@ -274,7 +272,6 @@ PATCH /api/products/{productId}
 - 404 Not Found
 	- 존재 하지 않음
 	- deleted_at NOT NULL
-- 409 Conflict -> DISCONTINUED 상태 수정 시도
 
 
 ## 5️⃣ 상품 재고 변경
