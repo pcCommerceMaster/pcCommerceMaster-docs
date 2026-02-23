@@ -14,6 +14,18 @@
 | SOLD_OUT | 품절 |
 | DISCONTINUED | 단종 |
 
+### 상품 카테고리(Enum)
+| 값        | 설명   |
+| -------- | ---- |
+| DESKTOP  | 데스크탑 |
+| LAPTOP   | 노트북  |
+| MONITOR  | 모니터  |
+| KEYBOARD | 키보드  |
+| MOUSE    | 마우스  |
+| ETC      | 기타   |
+
+
+
 ### 삭제 전략
 - soft delete는 deleted_at 컬럼으로 관리
 - 삭제 시 deleted_at = 현재 시간
@@ -53,15 +65,8 @@
 ### Endpoint:
 POST /api/products
 
-### Description:
+### Description: 
 새로운 상품을 등록한다
-- status는 클라이언트가 직접 입력할 수 없다
-- stock 기준으로 상태 자동 결정
-
-### 상태 자동 결정 정책
-
-- stock ≥ 1 → ON_SALE
-- stock ≤ 0 → SOLD_OUT
 
 ### Request Body
 
@@ -70,7 +75,8 @@ POST /api/products
   "productName": "상품명",
   "category": "상품 카테고리",
   "price": 120000,
-  "stock": 50
+  "stock": 50,
+  "status": "ON_SALE"
 }
 
 ```
@@ -78,7 +84,7 @@ POST /api/products
 ## Validation
 
 - productName: 필수
-- category: ENUM
+- category: ENUM 
 - price: 0 이상
 - stock: 0 이상
 
@@ -105,17 +111,17 @@ POST /api/products
 - 201 Created -> 상품 정상 등록
 
 - 400 Bad Request
-    - 필수값 누락
-    - ENUM 값 오류
-    - price < 0
-    - stock < 0
+	- 필수값 누락
+	- ENUM 값 오류
+	- price < 0
+	- stock < 0
 
 ## 2️⃣ 상품 리스트 조회
 
 ### Endpoint:
 GET /api/products
 
-### Description:
+### Description: 
 상품 목록을 조회한다
 - 기본적으로 deleted_at IS NULL 조건을 적용한다.
 - deleted_at이 NULL이 아닌 상품은 기본 조회 대상에서 제외된다.
@@ -170,9 +176,9 @@ GET /api/products
 ### Status Code
 - 200 OK -> 정상 조회
 - 400 Bad Request
-    - 허용되지 않은 sortBy
-    - size > 100
-    - ENUM 필터 값 오류
+	- 허용되지 않은 sortBy
+	- size > 100
+	- ENUM 필터 값 오류
 
 
 ## 3️⃣ 상품 상세 조회
@@ -180,7 +186,7 @@ GET /api/products
 ### Endpoint:
 GET /api/products/{productId}
 
-### Description:
+### Description: 
 특정 상품의 상세 정보를 조회한다.
 - deleted_at이 NULL이 아닌 경우 404 반환
 
@@ -207,8 +213,8 @@ GET /api/products/{productId}
 ### Status Code
 - 200 OK -> 정상 조회
 - 404 Not Found
-    - 존재하지 않는 productId
-    - deleted_at NOT NULL
+	- 존재하지 않는 productId
+	- deleted_at NOT NULL
 
 
 ## 4️⃣ 상품 정보 수정
@@ -216,7 +222,7 @@ GET /api/products/{productId}
 ### Endpoint:
 PATCH /api/products/{productId}
 
-### Description:
+### Description: 
 등록된 상품을 수정한다.
 
 ### 수정 가능 필드
@@ -263,11 +269,11 @@ PATCH /api/products/{productId}
 ### Status Code
 - 200 OK -> 정상 수정
 - 400 Bad Request
-    - 수정 불가 필드 포함
-    - ENUM 값 오류
+	- 수정 불가 필드 포함
+	- ENUM 값 오류
 - 404 Not Found
-    - 존재 하지 않음
-    - deleted_at NOT NULL
+	- 존재 하지 않음
+	- deleted_at NOT NULL
 - 409 Conflict -> DISCONTINUED 상태 수정 시도
 
 
@@ -276,7 +282,7 @@ PATCH /api/products/{productId}
 ### Endpoint:
 PATCH /api/products/{productId}/stock
 
-### Description:
+### Description: 
 재고 변경 시 상품 상태는 아래 정책에 따라 자동 변경 된다. (단종 여부를 최우선으로 판단한다.)
 - 재고 변경은 트랜잭션 기반으로 처리되며,
 - 동시 요청 시에도 음수 재고가 발생하지 않도록 동시성 제어를 적용한다.
@@ -321,11 +327,11 @@ PATCH /api/products/{productId}/stock
 ### Status Code
 - 200 OK -> 정상 변경
 - 400 Bad Request
-    - quantity <= 0
-    - DECREASE 시 재고 부족
+	- quantity <= 0
+	- DECREASE 시 재고 부족
 - 404 Not Found
-- 존재 하지 않음
-- deleted_at NOT NULL
+ - 존재 하지 않음
+ - deleted_at NOT NULL
 - 409 Conflict -> DISCONTINUED 상태에서 변경 시도
 
 
@@ -335,7 +341,7 @@ PATCH /api/products/{productId}/stock
 ### Endpoint:
 PATCH /api/products/{productId}/status
 
-### Description:
+### Description: 
 상품 상태를 변경한다
 
 ### Request
@@ -369,8 +375,8 @@ PATCH /api/products/{productId}/status
 - 400 Bad Request -> ENUM 오류
 - 404 Not Found -> 존재 하지 않음
 - 409 Conflict
-    - 허용되지 않은 상태 전이
-    - DISCONTINUED 상태에서 변경 시도
+	- 허용되지 않은 상태 전이
+	- DISCONTINUED 상태에서 변경 시도
 
 
 ### 7️⃣ 상품 삭제
@@ -378,7 +384,7 @@ PATCH /api/products/{productId}/status
 ### Endpoint:
 DELETE /api/products/{productId}
 
-### Description:
+### Description: 
 상품을 삭제 처리한다.(soft delete 방식)
 
 ### 처리
@@ -403,13 +409,13 @@ DELETE /api/products/{productId}
 ### Endpoint:
 PATCH /api/products/{productId}/restore
 
-### Description:
+### Description: 
 삭제된 상품을 복구한다
 - deleted_at NOT NULL 상태에서만 가능
 - 복구 시 기본 상태는 아래 정책 적용
 
 
-### 복구 상태 정책
+### 복구 상태 정책  
 
 | 조건 | 상태 |
 |------|------|
