@@ -54,14 +54,10 @@
 | 1    | status == DISCONTINUED | DISCONTINUED |
 | 2    | stock ≤ 0             | SOLD_OUT     |
 | 3    | stock ≥ 1             | ON_SALE      |
-
+- 재고 자동 동기화 정책은 상품 등록 시점과 재고 변경 시점 모두 적용.
 - DISCONTINUED 상태는 재고와 무관하게 유지
 - DISCONTINUED 여부 우선
 - 그 외 stock 기준 자동 결정
-
-### 추가 사항
-등록 시 상태는 입력값 그대로 저장,
- 자동 동기화는 재고 변경 시 적용
 
 
 ## 1️⃣ 상품 등록
@@ -71,6 +67,7 @@ POST /api/products
 
 ### Description: 
 새로운 상품을 등록한다
+
 
 ### Request Body
 
@@ -93,6 +90,13 @@ POST /api/products
 - stock: 0 이상
 - category: 공통사항에 정의된 상품 카테고리 Enum 값 (문자열)
 - status: 공통사항에 정의된 상품 상태 Enum 값 (문자열)
+
+### 처리
+- 등록시 상태 처리 정책
+- 요청 status가 DISCONTINUED인 경우 → DISCONTINUED 저장
+- 그 외:
+   - stock ≤ 0 → SOLD_OUT
+   - stock ≥ 1 → ON_SALE
 
 ### Response Body (201 Created)
 
@@ -121,6 +125,7 @@ POST /api/products
 	- ENUM 값 오류
 	- price < 0
 	- stock < 0
+
 
 ## 2️⃣ 상품 리스트 조회
 
