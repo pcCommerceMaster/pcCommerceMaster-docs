@@ -12,8 +12,10 @@
 - orderId: 주문 ID
 
 ## Authentication
-- 로그인 세션 필요(보호된 API)
-- 인증 실패 시 `401 UNAUTHORIZED` 반환
+- `HttpSession` 기반 관리자 인증 필요
+- `CS_ADMIN` 권한 필수
+- 인증 실패 시 `401 UNAUTHORIZED`
+- 권한 부족 시 `403 FORBIDDEN`
 
 ### Request Body
 ```json
@@ -48,9 +50,10 @@
 ### 409 예시 케이스
 - `SHIPPING` 상태에서 취소 시도
 - `DELIVERED` 상태에서 취소 시도
+- `CANCELLED` 상태에서 재취소 시도
 
 ### Error Responses
 - 인증 실패 → `401 UNAUTHORIZED`
 - 주문 없음 → `404 ORDER_NOT_FOUND`
-- 취소 불가 상태 → `409 INVALID_ORDER_STATUS`
-- 요청 오류 → `400 INVALID_REQUEST` (취소 사유 누락/형식 오류 등)
+- 취소 불가 상태 → `409 ORDER_CANCEL_NOT_ALLOWED`
+- 요청 오류 → `400 INVALID_INPUT` (취소 사유 누락/형식 오류 등)
