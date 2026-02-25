@@ -46,6 +46,7 @@
 | SOLD_OUT | ON_SALE, DISCONTINUED |
 | DISCONTINUED | 변경 불가 |
 
+
 ### 재고 자동 동기화 정책
 
 | 우선순위 | 조건                    | 상태           |
@@ -58,6 +59,9 @@
 - DISCONTINUED 여부 우선
 - 그 외 stock 기준 자동 결정
 
+### 추가 사항
+등록 시 상태는 입력값 그대로 저장,
+ 자동 동기화는 재고 변경 시 적용
 
 
 ## 1️⃣ 상품 등록
@@ -179,7 +183,9 @@ GET /api/products
 - 200 OK -> 정상 조회
 - 400 Bad Request
 	- 허용되지 않은 sortBy
-	- size > 100
+	- size < 1 또는 size > 100
+	- page < 1
+	- 허용되지 않은 direction 값
 	- ENUM 필터 값 오류
 
 
@@ -267,7 +273,7 @@ PATCH /api/products/{productId}
 ### Status Code
 - 200 OK -> 정상 수정
 - 400 Bad Request
-	- 수정 불가 필드 포함
+	- 유효성 검증 실패(상품명 길이 등)
 	- ENUM 값 오류
 - 404 Not Found
 	- 존재 하지 않음
@@ -329,8 +335,8 @@ PATCH /api/products/{productId}/stock
 - 404 Not Found
  - 존재 하지 않음
  - deleted_at NOT NULL
-- 409 Conflict -> DISCONTINUED 상태에서 변경 시도
-
+- 409 Conflict
+	- DISCONTINUED 상태에서 재고 변경 시도
 
 
 ## 6️⃣ 상품 상태 변경
@@ -374,6 +380,7 @@ PATCH /api/products/{productId}/status
 - 409 Conflict
 	- 허용되지 않은 상태 전이
 	- DISCONTINUED 상태에서 변경 시도
+	- stock = 0 인 경우 ON_SALE로 변경 불가
 
 
 ### 7️⃣ 상품 삭제
@@ -423,6 +430,7 @@ PATCH /api/products/{productId}/restore
 ### 처리
 - deleted_at = NULL
 - 복구 후 상태 재계산
+- updated_at = 현재 시간
 
 ```
 if status == DISCONTINUED → 유지
