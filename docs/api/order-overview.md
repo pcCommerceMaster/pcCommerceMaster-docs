@@ -7,7 +7,9 @@
     - `PREPARING → SHIPPING → DELIVERED`
     - `PREPARING → CANCELLED (배송 시작 이후 취소 불가)`
 - `CANCELLED` 상태는 최종 상태이며 이후 변경 불가
-- 구현 방식: 비관적 락(PESSIMISTIC_WRITE)
+- 구현 방식:
+  - 재고 동시성 제어: 비관적 락(PESSIMISTIC_WRITE)
+  - 인증/인가: Interceptor 기반 공통 처리
 
 ## Content Type
 - Request: `application/json`
@@ -27,10 +29,12 @@
 - PATCH `/api/orders/{orderId}/cancel` (Cancel)
 
 ## Authentication
-- `HttpSession` 기반 관리자 인증 필요
-- `Create/Status/Cancel`: `CS_ADMIN` 권한 필수
-- 인증 실패 시 `401 UNAUTHORIZED`
-- 권한 부족 시 `403 FORBIDDEN`
+- 인증 방식: `HttpSession`
+- 주문 CUD(Create / Status / Cancel) API는 `CS_ADMIN` 권한 필수
+- 조회(GET) API는 인증 없이 접근 가능
+- 인증/인가 검증은 `AdminAuthInterceptor`에서 공통 처리
+- 인증 실패 → 401 `UNAUTHORIZED`
+- 권한 부족 → 403 `FORBIDDEN`
 
 ## Common Error Codes
 | HTTP | Code                        | 설명                  |
@@ -43,8 +47,8 @@
 | 404 | `ORDER_NOT_FOUND`           | 주문이 존재하지 않음         |
 | 409 | `PRODUCT_STOCK_INSUFFICIENT` | 재고 부족               |
 | 409 | `PRODUCT_NOT_ON_SALE`       | 판매 중이 아님            |
-| 409 | `ORDER_INVALID_STATUS`      | 해당 상태에서 수행 불가       |
-| 409 | `ORDER_CANCEL_NOT_ALLOWED`  | 준비중 상태에서만 취소 가능     |
+| 409 | `ORDER_INVALID_STATUS`      | 허용되지 않는 상태 전이       |
+| 409 | `ORDER_CANCEL_NOT_ALLOWED`  | 취소 불가 상태     |
 
 - 주문 생성(Create) 시 주로 발생: `PRODUCT_NOT_FOUND`, `PRODUCT_STOCK_INSUFFICIENT`, `PRODUCT_NOT_ON_SALE`
 - 상태 변경/취소(Update/Cancel) 시 주로 발생: `ORDER_NOT_FOUND`, `ORDER_INVALID_STATUS`

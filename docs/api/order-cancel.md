@@ -12,10 +12,10 @@
 - orderId: 주문 ID
 
 ## Authentication
-- `HttpSession` 기반 관리자 인증 필요
+- 인증/인가 검증은 `AdminAuthInterceptor`에서 수행
 - `CS_ADMIN` 권한 필수
-- 인증 실패 시 `401 UNAUTHORIZED`
-- 권한 부족 시 `403 FORBIDDEN`
+- 인증 실패 시 → `401 UNAUTHORIZED`
+- 권한 부족 시 → `403 FORBIDDEN`
 
 ### Request Body
 ```json
@@ -25,16 +25,22 @@
 ```
 
 ### Validation
-- cancelReason: 필수 (문자열, 빈 문자열 불가)
+- `cancelReason`: 필수 (문자열, 빈 문자열 불가)
 
 ### Business Rules
 - `PREPARING` 상태에서만 취소 가능
 - 상태를 `CANCELLED`로 변경
 - 취소 사유를 `cancelReason`에 저장
 - 주문 수량만큼 재고 복구
+- 상품이 `DISCONTINUED` 상태여도 재고는 복구하되, 상품 상태는 유지
 - 취소 처리는 단일 트랜잭션으로 수행
+- 예외 발생 시 상태 변경 및 재고 복구는 모두 롤백
 - `CANCELLED` 상태 이후에는 추가 상태 변경 불가
-- 상품이 `DISCONTINUED` 상태여도 재고는 복구하되, 상품 상태는 `DISCONTINUED`를 유지한다.
+
+### 409 예시 케이스
+- `SHIPPING` 상태에서 취소 시도
+- `DELIVERED` 상태에서 취소 시도
+- `CANCELLED` 상태에서 재취소 시도
 
 ### Success Response
 - 200 OK
@@ -46,11 +52,6 @@
   "updatedAt": "2025-02-19T11:10:00"
 }
 ```
-
-### 409 예시 케이스
-- `SHIPPING` 상태에서 취소 시도
-- `DELIVERED` 상태에서 취소 시도
-- `CANCELLED` 상태에서 재취소 시도
 
 ### Error Responses
 - 인증 실패 → `401 UNAUTHORIZED`

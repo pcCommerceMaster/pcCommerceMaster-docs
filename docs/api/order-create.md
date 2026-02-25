@@ -9,10 +9,10 @@
 - 생성된 주문의 초기 상태는 `PREPARING`이다.
 
 ## Authentication
-- `HttpSession` 기반 관리자 인증 필요
+- 인증/인가 검증은 `AdminAuthInterceptor`에서 수행
 - `CS_ADMIN` 권한 필수
-- 인증 실패 시 `401 UNAUTHORIZED`
-- 권한 부족 시 `403 FORBIDDEN`
+- 인증 실패 → `401 UNAUTHORIZED`
+- 권한 부족 → `403 FORBIDDEN`
 
 ### Request Body
 ```json
@@ -29,22 +29,23 @@
 - quantity: 필수, 1 이상(`quantity >= 1`)
 
 ### Business Rules
-- 삭제된 상품은 주문 생성 불가
-- 상품 상태가 ON_SALE인 경우에만 주문 가능
-- 재고가 주문 수량 이상일 때만 주문 생성 가능(`stock >= quantity`)
+- 상품은 판매 가능 상태(ON_SALE)이며 삭제되지 않은 경우에만 주문 가능
+- 재고가 주문 수량 이상일 때만 주문 생성 가능 (`stock >= quantity`)
 - 주문 생성 시 상품의 현재 가격을 unitPrice에 저장 (스냅샷)
-- `totalAmount` = `unitPrice` × `quantity`
-- 주문 생성 시 재고 차감
+- `totalAmount` = `unitPrice × quantity`
 - 주문 상태는 `PREPARING`으로 설정
+- 주문 생성과 동시에 재고 차감
 - 주문 생성과 재고 차감은 하나의 트랜잭션 내에서 처리
-- 동시 요청 환경에서도 재고 초과 판매가 발생하지 않도록 보장
+- 예외 발생 시 주문 생성 및 재고 차감은 모두 롤백
+- 재고 차감 시 비관적 락(PESSIMISTIC_WRITE)을 적용하여 동시 요청 환경에서도 재고 초과 판매가 발생하지 않도록 보장
 
 ### Success Response
 - 201 Created
+- orderNumber는 `ORD-{timestamp}-{random}` 형식으로 생성
 ```json
 {
   "orderId": 9001,
-  "orderNumber": "ORD-20250219-0001",
+  "orderNumber": "ORD-1739938200000-a1b2",
   "status": "PREPARING",
   "quantity": 2,
   "unitPrice": 250000,
