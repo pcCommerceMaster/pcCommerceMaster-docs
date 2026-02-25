@@ -7,7 +7,7 @@
     - `PREPARING → SHIPPING → DELIVERED`
     - `PREPARING → CANCELLED (배송 시작 이후 취소 불가)`
 - `CANCELLED` 상태는 최종 상태이며 이후 변경 불가
-- 재고 차감은 동시성 제어(비관적 락)를 적용하여 처리
+- 구현 방식: 비관적 락(PESSIMISTIC_WRITE)
 
 ## Content Type
 - Request: `application/json`
