@@ -1,0 +1,41 @@
+## [Order] Get Customer List
+
+## [Customer] 고객 정보 다건 조회
+
+### Endpoint
+- **GET** `api/customers`
+
+### Description
+- 검색 키워드(이름, 이메일)와 상태 필터를 적용하여 탈퇴하지 않은 고객 목록을 조회합니다.
+
+### Query Parameters
+- `name` : 고객 이름
+- `email` : 이메일
+- `phoneNumber` : 전화번호
+- `status`: 고객상태 필터 (`ACTIVE`, `INACTIVE`, `SUSPENDED`, `WITHDRAWN`)
+- `createdAt` : 가입일
+- `page`: 페이지 번호 (기본값: 1)
+- `size`: 페이지 당 개수 (기본값: 10)
+- `sortBy`: 정렬 기준 (`quantity`, `total_amount`, `created_at`)
+- `sortOrder`: 정렬 순서 (asc, desc)
+
+### Request Body
+```json
+  {
+    "content": [
+      {
+        "id": 1,
+        "name": "임호진",
+        "email": "hojin@example.com",
+        "phoneNumber": "010-1234-5678",
+        "status": "ACTIVE",
+        "createdAt": "2026-02-22T12:00:00"
+      }
+    ],
+    "paging": {
+      "currentPage": 1,
+      "size": 10,
+      "totalElements": 145,
+      "totalPages": 15
+    }
+  }

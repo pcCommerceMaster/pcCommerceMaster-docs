@@ -1,0 +1,21 @@
+
+
+
+
+
+
+< - 역할 및 상태 변경>
+   CustomerListResponseBody {
+
+     "customer_id" : "aaa"
+     "status" : "aaa"
+
+}
+
+
+<관리자 정보관리 - 역할 및 상태 변경에 따른 승인·거부>
+CustomerShiftRoleResponseBody{
+  "admin_id" :
+  "role" : "aaa"
+  "status" : "aaa"
+  "approved_at" : @@@@-@@-@@

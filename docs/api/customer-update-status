@@ -1,0 +1,42 @@
+## [Order] 고객 상태 변경
+- 공통 정책/에러코드: `customer-overview.md` 참고
+
+### Endpoint
+- **PATCH** `/api/customers/{customerId}/status`
+
+### Description
+- 마케팅 및 운영 정책에 따라 고객의 활동 상태를 변경합니다.
+
+## Authentication
+- 로그인 세션 필요(보호된 API)
+- 인증 실패 시 `401 UNAUTHORIZED` 반환
+
+### Path Params
+- customerId: 고객 ID
+
+### Request Body
+```json
+{
+  "status": "------",
+}
+```
+
+### Validation
+- status 필수
+- 허용 값: `ACTIVE`, `INACTIVE`,`SUSPENDED` (ENUM)
+
+### Business Rules
+- 탈퇴 처리된 고객(deletedAt이 존재하는 경우)은 상태를 변경할 수 없습니다.
+
+### Success Response
+- 200 OK
+```json
+{
+  "customerId": 1,
+  "status": "SUSPENDED",
+  "updatedAt": "2026-02-22T13:00:00"
+}
+```
+
+### Error Responses
+- 허용되지 않은 상태값으로 요청한 경우. → `400 Bad Request`

@@ -1,0 +1,23 @@
+## [Customer] 고객 정보 삭제
+- 공통 정책/에러코드: `customer-overview.md` 참고
+
+### Endpoint
+- **GET** `/api/customers/{customerId}`
+
+### Description
+- 고객 요청 시 시스템에서 논리적으로 삭제 처리합니다.
+
+### Path Params
+- customerId : 고객 ID
+
+### Validation
+- id: 시스템에 존재하는 양의 정수(Long), 유효한 id
+
+### Business Rules
+- 이미 Soft-delete 된 고객(deletedAt이 있는 경우)은 404 Not Found를 반환합니다.
+
+### Success Response
+- 204 No Content : 응답 본문 없음
+
+### Error Responses
+- 404 Not Found: 존재하지 않거나 삭제된 ID인 경우.

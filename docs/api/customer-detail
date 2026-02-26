@@ -1,0 +1,32 @@
+## [Customer] 고객 정보 조회
+
+### Endpoint
+- **GET** `/api/customers/{customerId}`
+
+### Description
+- 특정 고객의 고유 식별자(ID)를 통해 전체 상세 정보를 조회합니다.
+
+### Path Params
+- customerId : 고객 ID
+
+### Validation
+- id: 시스템에 존재하는 양의 정수(Long).
+
+### Business Rules
+- 이미 Soft-delete 된 고객(deletedAt이 있는 경우)은 404 Not Found를 반환합니다.
+
+### Request Body
+
+```json
+{
+  "customerId": 1,
+  "name": "임호진",
+  "email": "hojin@example.com",
+  "phoneNumber": "010-1234-5678",
+  "status": "ACTIVE",
+  "createdAt": "2026-02-22T12:00:00"
+}
+```
+
+### Error Responses
+- 존재하지 않거나 삭제된 ID인 경우. → 404 Not Found
